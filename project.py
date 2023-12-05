@@ -276,6 +276,8 @@ class Arcball(customtkinter.CTk):
             vr = quatFunc.Rotate3D(v, q)[0]
             self.M[:,i] = vr[:,0].T
 
+        self.rotM = quatFunc.Quat2RotM(q)
+        
         self.update_cube()
 
     

@@ -50,6 +50,6 @@ def Quat2RotM(q:np.ndarray[4,1]) -> np.ndarray[3,3]:
     R = np.zeros((3,3))
     #Referente al documento de teoria sobre conversion entre quaternion y matriz de rotacion:
     #Calcula por raices cuadradas. Usa el mayor valor para determinar el orden de calculos para evitar valores erroneos
-
+    
 
     return R
