@@ -7,6 +7,9 @@ import matplotlib.pyplot as plt
 
 import numpy as np
 
+import quaternion_functions as quatFunc
+import rotation_functions as rotFunc
+
 customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
@@ -260,7 +263,20 @@ class Arcball(customtkinter.CTk):
         """
         Event triggered function on the event of a push on the button button_quat
         """
-        pass
+        q = np.zeros((4,1))
+        q[0,0] = self.entry_quat_0.get()
+        q[1,0] = self.entry_quat_1.get()
+        q[2,0] = self.entry_quat_2.get()
+        q[3,0] = self.entry_quat_3.get()
+
+        q = q/np.linalg.norm(q) #normalize the quaternion
+        
+        for i in range(self.M.shape[1]): #TODO buscar que coño es self.M en este caso
+            v = np.array(self.M[:,i],ndmin=2).T
+            vr = quatFunc.Rotate3D(v, q)[0]
+            self.M[:,i] = vr[:,0].T
+
+        self.update_cube()
 
     
     def onclick(self, event):
