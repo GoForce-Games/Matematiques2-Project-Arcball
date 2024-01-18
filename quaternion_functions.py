@@ -47,9 +47,19 @@ def Rotate3D(v:np.ndarray[3,1], q:np.ndarray[4,1]) -> Tuple[np.ndarray[3,1],floa
 
 
 def Quat2RotM(q:np.ndarray[4,1]) -> np.ndarray[3,3]:
-    R = np.zeros((3,3))
+
+    q_copy = q.copy()
+    qs = q_copy[0,0]
+    qv = q_copy[1:,0:]
+
     #Referente al documento de teoria sobre conversion entre quaternion y matriz de rotacion:
+
     #Calcula por raices cuadradas. Usa el mayor valor para determinar el orden de calculos para evitar valores erroneos
-    
+
+    R1 = (qs**2-qv.T@qv)*np.eye(3)
+    R2 = 2*(qv@qv.T)
+    R3 = 2*qs*rFunc.sk(q[1:,:])
+
+    R = R1+R2+R3
 
     return R

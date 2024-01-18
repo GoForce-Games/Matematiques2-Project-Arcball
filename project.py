@@ -277,9 +277,31 @@ class Arcball(customtkinter.CTk):
             self.M[:,i] = vr[:,0].T
 
         self.rotM = quatFunc.Quat2RotM(q)
+        self.update_rotM_visual()
         
         self.update_cube()
 
+    def update_rotM_visual(self):
+        """
+        Updates the rotation matrix shown on the bottom-right corner of the application
+        """
+        entries = [
+            (self.entry_RotM_11,self.rotM[0,0]),
+            (self.entry_RotM_12,self.rotM[0,1]),
+            (self.entry_RotM_13,self.rotM[0,2]),
+            (self.entry_RotM_21,self.rotM[1,0]),
+            (self.entry_RotM_22,self.rotM[1,1]),
+            (self.entry_RotM_23,self.rotM[1,2]),
+            (self.entry_RotM_31,self.rotM[2,0]),
+            (self.entry_RotM_32,self.rotM[2,1]),
+            (self.entry_RotM_33,self.rotM[2,2]),
+        ]
+
+        for entry,value in entries:
+            entry.configure(state="normal")
+            entry.delete(0,"end")
+            entry.insert(0,value)
+            entry.configure(state="disabled")
     
     def onclick(self, event):
         """
