@@ -229,11 +229,23 @@ class Arcball(customtkinter.CTk):
     
 
     def resetbutton_pressed(self):
-        """
-        Event triggered function on the event of a push on the button Reset
-        """
-        
-        pass
+      """
+      Event triggered function on the event of a push on the button Reset
+      """
+      # Restaurar la posición inicial del cubo
+      self.M = np.array([
+          [-1, -1, 1],
+          [-1, 1, 1],
+          [1, 1, 1],
+          [1, -1, 1],
+          [-1, -1, -1],
+          [-1, 1, -1],
+          [1, 1, -1],
+          [1, -1, -1]
+      ], dtype=float).transpose()
+
+      # Actualizar el cubo en la interfaz gráfica
+      self.update_cube()
 
     
     def apply_AA(self):
@@ -327,10 +339,40 @@ class Arcball(customtkinter.CTk):
 
     
     def apply_EA(self):
-        """
-        Event triggered function on the event of a push on the button button_EA
-        """
-        pass
+     """
+     Event triggered function on the event of a push on the button button_euler_angles
+     """
+     angles = np.zeros(3)
+     angles[0] = self.entry_EA_roll.get()
+     angles[1] = self.entry_EA_pitch.get()
+     angles[2] = self.entry_EA_yaw.get()
+
+     for i in range(self.M.shape[1]): 
+        v = np.array(self.M[:,i], ndmin=2).T
+        
+        yaw, pitch, roll = angles
+
+        # Matrices de rotación en los ejes respectivos
+        R_yaw = np.array([[np.cos(yaw), -np.sin(yaw), 0],
+                          [np.sin(yaw), np.cos(yaw), 0],
+                          [0, 0, 1]])
+
+        R_pitch = np.array([[np.cos(pitch), 0, np.sin(pitch)],
+                            [0, 1, 0],
+                            [-np.sin(pitch), 0, np.cos(pitch)]])
+
+        R_roll = np.array([[1, 0, 0],
+                           [0, np.cos(roll), -np.sin(roll)],
+                           [0, np.sin(roll), np.cos(roll)]])
+    
+        # Aplicar rotaciones en el orden yaw-pitch-roll
+        rotated_vector = R_yaw @ R_pitch @ R_roll @ v
+
+        self.M[:,i] = rotated_vector[:,0].T
+ 
+    
+
+     self.update_cube()
 
     
     def apply_quat(self):
