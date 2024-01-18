@@ -389,7 +389,7 @@ class Arcball(customtkinter.CTk):
         
         for i in range(self.M.shape[1]): #TODO buscar que coño es self.M en este caso
             v = np.array(self.M[:,i],ndmin=2).T
-            vr = quatFunc.Rotate3D(v, q)[0]
+            vr = quatFunc.Rotate3D(v, q)
             self.M[:,i] = vr[:,0].T
 
         self.rotM = quatFunc.Quat2RotM(q)

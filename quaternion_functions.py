@@ -37,13 +37,13 @@ def Eaa2Quat(axis:np.ndarray[3,1],angle:float) -> np.ndarray[4,1]:
     u = axis.copy()
     return np.array([[cos],[sin*u[0,0]],[sin*u[1,0]],[sin*u[2,0]]])
 
-def Rotate3D(v:np.ndarray[3,1], q:np.ndarray[4,1]) -> Tuple[np.ndarray[3,1],float]:
+def Rotate3D(v:np.ndarray[3,1], q:np.ndarray[4,1]) -> np.ndarray[3,1]:
     '''
     Rotates a vector in 3D space. quaternion must be normalized
     '''
     qv = np.array([[0],[v[0,0]],[v[1,0]],[v[2,0]]]) #convert the vector to quaternion for calculation
     v2 = MultQuat(q,MultQuat(qv,ConjQuat(q))) #v2 = q*v*~q
-    return np.array(v2[1:,0:]), v2[0,0]
+    return np.array(v2[1:,0:])
 
 
 def Quat2RotM(q:np.ndarray[4,1]) -> np.ndarray[3,3]:
