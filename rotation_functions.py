@@ -152,9 +152,38 @@ def RotM2Eaa(matrix:np.ndarray) ->Tuple[np.ndarray,float]:
     return axis, angle
 
 
+def RotVec2RotM(vector:np.ndarray) -> np.ndarray:
+    '''
+    Returns the rotation matrix R able to rotate vectors an angle 'angle' (in rads) about the axis 'axis'
+    '''
+    angle = np.linalg.norm(vector)
+    axis = vector / angle
+
+    sin = np.sin(angle)
+    cos = np.cos(angle)
+    R1 = np.eye(3)*cos
+    R2 = (1-cos)*(axis @ axis.T)
+    R3 = sk(axis)*sin
+
+    R = R1+R2+R3
+
+    return R
+
+#rotate3d function for rotation vector rotation with a rotation vector as a parameter
+def Rotate3D_RV(v:np.ndarray[3,1], vector:np.ndarray) -> np.ndarray[3,1]:
+    '''
+    Rotates a vector in 3D space. quaternion must be normalized
+    '''
+    q = RotVec2RotM(vector)
+    return q@v
 
 
-
+def Rotate3D_AA(v:np.ndarray[3,1], axis:np.ndarray[3,1], angle:float) -> np.ndarray[3,1]:
+    '''
+    Rotates a vector in 3D space. quaternion must be normalized
+    '''
+    q = Eaa2rotM(angle,axis)
+    return q@v
 
 
 

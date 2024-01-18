@@ -229,34 +229,150 @@ class Arcball(customtkinter.CTk):
     
 
     def resetbutton_pressed(self):
-        """
-        Event triggered function on the event of a push on the button Reset
-        """
-        pass
+      """
+      Event triggered function on the event of a push on the button Reset
+      """
+      # Restaurar la posición inicial del cubo
+      self.M = np.array([
+          [-1, -1, 1],
+          [-1, 1, 1],
+          [1, 1, 1],
+          [1, -1, 1],
+          [-1, -1, -1],
+          [-1, 1, -1],
+          [1, 1, -1],
+          [1, -1, -1]
+      ], dtype=float).transpose()
+
+      # Actualizar el cubo en la interfaz gráfica
+      self.update_cube()
 
     
     def apply_AA(self):
         """
         Event triggered function on the event of a push on the button button_AA
         """
-        #Example on hot to get values from entries:
-        angle = self.entry_AA_angle.get()
-        #Example string to number
-        print(float(angle)*2)
+        axis = np.array((float(self.entry_AA_ax1.get()), float(self.entry_AA_ax2.get()), float(self.entry_AA_ax3.get())))
+        angle = float(self.entry_AA_angle.get())
 
+        # Convert axis tuple to NumPy array
+        #axis = np.array(axis)
+
+        # Skew-symmetric matrix of axis
+        S = self.skew_symetric = np.array([[0, -axis[2], axis[1]], [axis[2], 0, -axis[0]], [-axis[1], axis[0], 0]])
+
+        # S ^2
+        S2 = S.dot(S)
+
+        # R = I + sin(angle)*S + (1-cos(angle))*S^2
+        self.rotM = np.eye(3) + np.sin(angle) * S + (1 - np.cos(angle)) * S2
+
+        # update cube
+
+        # Update rotation matrix info
+        entries = [
+            (self.entry_RotM_11, self.rotM[0, 0]),
+            (self.entry_RotM_12, self.rotM[0, 1]),
+            (self.entry_RotM_13, self.rotM[0, 2]),
+            (self.entry_RotM_21, self.rotM[1, 0]),
+            (self.entry_RotM_22, self.rotM[1, 1]),
+            (self.entry_RotM_23, self.rotM[1, 2]),
+            (self.entry_RotM_31, self.rotM[2, 0]),
+            (self.entry_RotM_32, self.rotM[2, 1]),
+            (self.entry_RotM_33, self.rotM[2, 2])
+        ]
+
+        for entry, value in entries:
+            entry.configure(state="normal")
+            entry.delete(0, "end")
+            entry.insert(0, value)
+            entry.configure(state="disabled")
+
+        
+        for i in range(self.M.shape[1]):
+            v = np.array(self.M[:,i],ndmin=2).T
+            vr = rotFunc.Rotate3D_AA(v, axis, angle)[0]
+            self.M[:,i] = vr[:,0].T
+        
+        self.update_cube()
+
+        pass
+        
     
     def apply_rotV(self):
         """
         Event triggered function on the event of a push on the button button_rotV 
         """
+        RV = self.rotv = np.array((self.entry_rotV_1.get(), self.entry_rotV_2.get(), self.entry_rotV_3.get()))
+        RV = self.rotv = np.asarray(self.rotv, dtype=float) / np.linalg.norm(np.asarray(self.rotv, dtype=float))
+        self.rotM = rotFunc.RotVec2RotM(self.rotv)
+        
+        #mueve el cubo a partir del vector de rotacion
+        """
+        for i in range(self.M.shape[1]):
+            v = np.array(self.M[:,i],ndmin=2).T
+            vr = rotFunc.Rotate3D_RV(v, RV)[0]
+            self.M[:,i] = vr[:,0].T
+        """
+        # Update rotation matrix info
+        
+        entries = [
+            (self.entry_RotM_11, self.rotM[0, 0]),
+            (self.entry_RotM_12, self.rotM[0, 1]),
+            (self.entry_RotM_13, self.rotM[0, 2]),
+            (self.entry_RotM_21, self.rotM[1, 0]),
+            (self.entry_RotM_22, self.rotM[1, 1]),
+            (self.entry_RotM_23, self.rotM[1, 2]),
+            (self.entry_RotM_31, self.rotM[2, 0]),
+            (self.entry_RotM_32, self.rotM[2, 1]),
+            (self.entry_RotM_33, self.rotM[2, 2])
+        ]
+
+        for entry, value in entries:
+            entry.configure(state="normal")
+            entry.delete(0, "end")
+            entry.insert(0, value)
+            entry.configure(state="disabled")
+
+        self.update_cube()        
         pass
 
     
     def apply_EA(self):
-        """
-        Event triggered function on the event of a push on the button button_EA
-        """
-        pass
+     """
+     Event triggered function on the event of a push on the button button_euler_angles
+     """
+     angles = np.zeros(3)
+     angles[0] = self.entry_EA_roll.get()
+     angles[1] = self.entry_EA_pitch.get()
+     angles[2] = self.entry_EA_yaw.get()
+
+     for i in range(self.M.shape[1]): 
+        v = np.array(self.M[:,i], ndmin=2).T
+        
+        yaw, pitch, roll = angles
+
+        # Matrices de rotación en los ejes respectivos
+        R_yaw = np.array([[np.cos(yaw), -np.sin(yaw), 0],
+                          [np.sin(yaw), np.cos(yaw), 0],
+                          [0, 0, 1]])
+
+        R_pitch = np.array([[np.cos(pitch), 0, np.sin(pitch)],
+                            [0, 1, 0],
+                            [-np.sin(pitch), 0, np.cos(pitch)]])
+
+        R_roll = np.array([[1, 0, 0],
+                           [0, np.cos(roll), -np.sin(roll)],
+                           [0, np.sin(roll), np.cos(roll)]])
+    
+        # Aplicar rotaciones en el orden yaw-pitch-roll
+        rotated_vector = R_yaw @ R_pitch @ R_roll @ v
+
+        self.M[:,i] = rotated_vector[:,0].T
+ 
+    
+
+     self.update_cube()
 
     
     def apply_quat(self):
