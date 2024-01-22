@@ -124,22 +124,26 @@ def sk(v:np.ndarray[3,1]) -> np.ndarray[3,3]:
     return vsk
 
 
-def Eaa2rotM(angle: float, axis: np.ndarray[3,1]) -> np.ndarray[3,3]:
+def Eaa2rotM(angle, axis):
     '''
     Returns the rotation matrix R able to rotate vectors an angle 'angle' (in rads) about the axis 'axis'
+    Axis = X Y Z
     '''
-    axis = axis / np.linalg.norm(axis)
 
-    sin = np.sin(angle)
-    cos = np.cos(angle)
-    R1 = np.eye(3)*cos
-    R2 = (1-cos)*(axis @ axis.T)
-    R3 = sk(axis)*sin
+    
+    axis_norm = np.linalg.norm(axis)
+    
 
-    R = R1+R2+R3
+    if axis_norm > 1:
+        axis = axis / axis_norm
+
+    if axis.ndim == 1:
+        axis = axis.reshape((-1, 1))
+    
+
+    R = np.eye(3) * np.cos(np.radians(angle)) + (1 - np.cos(np.radians(angle))) * np.outer(axis, axis) + np.sin(np.radians(angle)) * np.array([[0, -axis[2, 0], axis[1, 0]], [axis[2, 0], 0, -axis[0, 0]], [-axis[1, 0], axis[0, 0], 0]])
 
     return R
-
 
 def RotM2Eaa(matrix:np.ndarray) ->Tuple[np.ndarray,float]:
     '''

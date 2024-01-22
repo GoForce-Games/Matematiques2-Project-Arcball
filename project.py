@@ -321,8 +321,6 @@ class Arcball(customtkinter.CTk):
         self.entry_AA_ax2.insert(0,axis_org[1])
         self.entry_AA_ax3.insert(0,axis_org[2])
 
-
-        
     
     def rotMToRotationVector(self, rotM):
         R = rotM
@@ -349,34 +347,7 @@ class Arcball(customtkinter.CTk):
         self.entry_rotV_2.insert(0,rotV[1])
         self.entry_rotV_3.insert(0,rotV[2])
         
-    
-    
-
-        R = rotM
-
-        angle = np.arccos((np.trace(R) - 1) / 2)
-        if(angle != 0):
-            axis = (R - R.T) / (2 * np.sin(angle))
-            axis_org = np.array([axis[2, 1], axis[0, 2], axis[1, 0]])
-        else:
-            axis_org = np.array([1,0,0])
-
-        Q = np.zeros([4])
-        Q[0] = np.cos(angle/2)
-        Q[1] = np.sin(angle/2) * axis_org[0]    
-        Q[2] = np.sin(angle/2) * axis_org[1]
-        Q[3] = np.sin(angle/2) * axis_org[2]
-
-        self.entry_quat_0.delete(0,99)
-        self.entry_quat_1.delete(0,99)
-        self.entry_quat_2.delete(0,99)
-        self.entry_quat_3.delete(0,99)
-        self.entry_quat_0.insert(0,Q[0])
-        self.entry_quat_1.insert(0,Q[1])
-        self.entry_quat_2.insert(0,Q[2])
-        self.entry_quat_3.insert(0,Q[3])
-
-
+     
     def resetbutton_pressed(self):
       """
       Event triggered function on the event of a push on the button Reset
@@ -415,7 +386,7 @@ class Arcball(customtkinter.CTk):
         axisX = float(self.entry_AA_ax1.get())
         axisY = float(self.entry_AA_ax2.get())
         axisZ = float(self.entry_AA_ax3.get())
-        rotM = rotFunc.Eaa2rotM(angle, np.array([axisX, axisY, axisZ]))
+        rotM = rotFunc.Eaa2r5otM(angle, np.array([axisX, axisY, axisZ]))
     
         #self.M = rotM@self.M 
         
