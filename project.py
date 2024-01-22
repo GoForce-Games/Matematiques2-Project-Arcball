@@ -291,7 +291,7 @@ class Arcball(customtkinter.CTk):
         
         for i in range(self.M.shape[1]):
             v = np.array(self.M[:,i],ndmin=2).T
-            vr = rotFunc.Rotate3D_AA(v, axis, angle)[0]
+            vr = rotFunc.Rotate3D_AA(v, axis, angle)
             self.M[:,i] = vr[:,0].T
         
         self.update_cube()
@@ -303,17 +303,20 @@ class Arcball(customtkinter.CTk):
         """
         Event triggered function on the event of a push on the button button_rotV 
         """
-        RV = self.rotv = np.array((self.entry_rotV_1.get(), self.entry_rotV_2.get(), self.entry_rotV_3.get()))
-        RV = self.rotv = np.asarray(self.rotv, dtype=float) / np.linalg.norm(np.asarray(self.rotv, dtype=float))
+        self.rotv = np.array((self.entry_rotV_1.get(), self.entry_rotV_2.get(), self.entry_rotV_3.get()))
+        self.rotv = np.asarray(self.rotv, dtype=float) / np.linalg.norm(np.asarray(self.rotv, dtype=float))
         self.rotM = rotFunc.RotVec2RotM(self.rotv)
         
         #mueve el cubo a partir del vector de rotacion
-        """
-        for i in range(self.M.shape[1]):
-            v = np.array(self.M[:,i],ndmin=2).T
-            vr = rotFunc.Rotate3D_RV(v, RV)[0]
+
+        # Update cube
+        for i in range(self.M.shape[1]): 
+            v = np.array(self.M[:,i], ndmin=2).T
+            vr = rotFunc.Rotate3D_RV(v, self.rotM)
             self.M[:,i] = vr[:,0].T
-        """
+        
+        self.update_cube()
+       
         # Update rotation matrix info
         
         entries = [
@@ -334,7 +337,7 @@ class Arcball(customtkinter.CTk):
             entry.insert(0, value)
             entry.configure(state="disabled")
 
-        self.update_cube()        
+   
         pass
 
     
