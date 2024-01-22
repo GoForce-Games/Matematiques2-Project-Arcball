@@ -173,7 +173,7 @@ def Rotate3D_RV(v:np.ndarray[3,1], vector:np.ndarray) -> np.ndarray[3,1]:
     '''
     Rotates a vector in 3D space. quaternion must be normalized
     '''
-    vector = vector / np.linalg.norm(vector)  # Normalize the rotation vector
+  
     q = RotVec2RotM(vector)
     return q @ v
 
@@ -185,6 +185,15 @@ def Rotate3D_AA(v:np.ndarray[3,1], axis:np.ndarray[3,1], angle:float) -> np.ndar
     q = Eaa2rotM(angle,axis)
     return q@v
 
+#Rotation vector to axis angle
+def RV2AA(vector:np.ndarray) -> Tuple[np.ndarray,float]:
+    '''
+    Converts a rotation vector to an axis and angle tuple
+    '''
+    angle = np.linalg.norm(vector)
+    axis = vector / angle
+
+    return axis, angle
 
 
 

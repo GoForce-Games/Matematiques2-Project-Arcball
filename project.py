@@ -227,6 +227,155 @@ class Arcball(customtkinter.CTk):
         self.entry_RotM_33.configure(state="disabled")
         self.entry_RotM_33.grid(row=2, column=3, padx=(2,0), pady=(2,0), sticky="ew")
     
+    def setRotMatrix(self, rotM):
+        """
+        Funcion que hace cambiar la rotM de abajo
+        """
+
+        rotM = rotM.copy()
+       
+        self.entry_RotM_11.configure(state="normal")
+        self.entry_RotM_12.configure(state="normal")
+        self.entry_RotM_13.configure(state="normal")
+        self.entry_RotM_21.configure(state="normal")
+        self.entry_RotM_22.configure(state="normal")
+        self.entry_RotM_23.configure(state="normal")
+        self.entry_RotM_31.configure(state="normal")
+        self.entry_RotM_32.configure(state="normal")
+        self.entry_RotM_33.configure(state="normal")
+
+        self.entry_RotM_11.delete(0, 99)
+        self.entry_RotM_12.delete(0, 99)
+        self.entry_RotM_13.delete(0, 99)
+        self.entry_RotM_21.delete(0, 99)
+        self.entry_RotM_22.delete(0, 99)
+        self.entry_RotM_23.delete(0, 99)
+        self.entry_RotM_31.delete(0, 99)
+        self.entry_RotM_32.delete(0, 99)
+        self.entry_RotM_33.delete(0, 99)
+
+        
+        if(abs(rotM[0][0]) < 1.0e-16):
+            rotM[0][0] = 0
+        if(abs(rotM[0][1]) < 1.0e-16):
+            rotM[0][1] = 0
+        if(abs(rotM[0][2]) < 1.0e-16):
+            rotM[0][2] = 0
+        if(abs(rotM[1][0]) < 1.0e-16):
+            rotM[1][0] = 0
+        if(abs(rotM[1][1]) < 1.0e-16):
+            rotM[1][1] = 0
+        if(abs(rotM[1][2]) < 1.0e-16):
+            rotM[1][2] = 0
+        if(abs(rotM[2][0]) < 1.0e-16):
+            rotM[2][0] = 0
+        if(abs(rotM[2][1]) < 1.0e-16):
+            rotM[2][1] = 0
+        if(abs(rotM[2][2]) < 1.0e-16):
+            rotM[2][2] = 0
+        
+
+        
+
+        self.entry_RotM_11.insert(0,rotM[0][0])
+        self.entry_RotM_12.insert(0,rotM[0][1])
+        self.entry_RotM_13.insert(0,rotM[0][2])
+        self.entry_RotM_21.insert(0,rotM[1][0])
+        self.entry_RotM_22.insert(0,rotM[1][1])
+        self.entry_RotM_23.insert(0,rotM[1][2])
+        self.entry_RotM_31.insert(0,rotM[2][0])
+        self.entry_RotM_32.insert(0,rotM[2][1])
+        self.entry_RotM_33.insert(0,rotM[2][2])
+
+        self.entry_RotM_11.configure(state="disabled")
+        self.entry_RotM_12.configure(state="disabled")
+        self.entry_RotM_13.configure(state="disabled")
+        self.entry_RotM_21.configure(state="disabled")
+        self.entry_RotM_22.configure(state="disabled")
+        self.entry_RotM_23.configure(state="disabled")
+        self.entry_RotM_31.configure(state="disabled")
+        self.entry_RotM_32.configure(state="disabled")
+        self.entry_RotM_33.configure(state="disabled")
+
+    def rotMToAngleAxis(self, rotM):
+
+        
+        R = rotM
+
+        angle = np.arccos((np.trace(R) - 1) / 2)
+        if(angle != 0):
+            axis = (R - R.T) / (2 * np.sin(angle))
+            axis_org = np.array([axis[2, 1], axis[0, 2], axis[1, 0]])
+        else:
+            axis_org = np.array([1,0,0])
+
+        angle = np.rad2deg(angle)
+
+        self.entry_AA_angle.delete(0,99)
+        self.entry_AA_angle.insert(0, angle)
+
+        self.entry_AA_ax1.delete(0,99)
+        self.entry_AA_ax2.delete(0,99)
+        self.entry_AA_ax3.delete(0,99)
+        self.entry_AA_ax1.insert(0,axis_org[0])
+        self.entry_AA_ax2.insert(0,axis_org[1])
+        self.entry_AA_ax3.insert(0,axis_org[2])
+
+
+        
+    
+    def rotMToRotationVector(self, rotM):
+        R = rotM
+
+        angle = np.arccos((np.trace(R) - 1) / 2)
+
+        
+
+
+        if(angle != 0):
+            axis = (R - R.T) / (2 * np.sin(angle))
+            axis_org = np.array([axis[2, 1], axis[0, 2], axis[1, 0]])
+        else:
+            axis_org = np.array([1,0,0])
+
+        rotV = axis_org * np.rad2deg(angle)
+
+
+       
+        self.entry_rotV_1.delete(0,99)
+        self.entry_rotV_2.delete(0,99)
+        self.entry_rotV_3.delete(0,99)
+        self.entry_rotV_1.insert(0,rotV[0])
+        self.entry_rotV_2.insert(0,rotV[1])
+        self.entry_rotV_3.insert(0,rotV[2])
+        
+    
+    
+
+        R = rotM
+
+        angle = np.arccos((np.trace(R) - 1) / 2)
+        if(angle != 0):
+            axis = (R - R.T) / (2 * np.sin(angle))
+            axis_org = np.array([axis[2, 1], axis[0, 2], axis[1, 0]])
+        else:
+            axis_org = np.array([1,0,0])
+
+        Q = np.zeros([4])
+        Q[0] = np.cos(angle/2)
+        Q[1] = np.sin(angle/2) * axis_org[0]    
+        Q[2] = np.sin(angle/2) * axis_org[1]
+        Q[3] = np.sin(angle/2) * axis_org[2]
+
+        self.entry_quat_0.delete(0,99)
+        self.entry_quat_1.delete(0,99)
+        self.entry_quat_2.delete(0,99)
+        self.entry_quat_3.delete(0,99)
+        self.entry_quat_0.insert(0,Q[0])
+        self.entry_quat_1.insert(0,Q[1])
+        self.entry_quat_2.insert(0,Q[2])
+        self.entry_quat_3.insert(0,Q[3])
+
 
     def resetbutton_pressed(self):
       """
@@ -252,24 +401,61 @@ class Arcball(customtkinter.CTk):
         """
         Event triggered function on the event of a push on the button button_AA
         """
-        axis = np.array((float(self.entry_AA_ax1.get()), float(self.entry_AA_ax2.get()), float(self.entry_AA_ax3.get())))
+        self.M = np.array(
+            [[ -1,  -1, 1],   #Node 0
+            [ -1,   1, 1],    #Node 1
+            [1,   1, 1],      #Node 2
+            [1,  -1, 1],      #Node 3
+            [-1,  -1, -1],    #Node 4
+            [-1,  1, -1],     #Node 5
+            [1,   1, -1],     #Node 6
+            [1,  -1, -1]], dtype=float).transpose()
+
         angle = float(self.entry_AA_angle.get())
+        axisX = float(self.entry_AA_ax1.get())
+        axisY = float(self.entry_AA_ax2.get())
+        axisZ = float(self.entry_AA_ax3.get())
+        rotM = rotFunc.Eaa2rotM(angle, np.array([axisX, axisY, axisZ]))
+    
+        #self.M = rotM@self.M 
+        
+        
+        self.M = np.dot(rotM, self.M)
+        
 
-        # Convert axis tuple to NumPy array
-        #axis = np.array(axis)
 
-        # Skew-symmetric matrix of axis
-        S = self.skew_symetric = np.array([[0, -axis[2], axis[1]], [axis[2], 0, -axis[0]], [-axis[1], axis[0], 0]])
+        self.setRotMatrix(rotM)
+        self.rotMToRotationVector(rotM)
+        self.rotM = rotM
+        self.update_cube()
 
-        # S ^2
-        S2 = S.dot(S)
+        pass
+        
+    
+    def convert_to_axis_angle(rotv):
+        """
+        Convert a rotation vector to axis and angle representation.
+        """
+        angle = np.linalg.norm(rotv)
+        axis = rotv / angle
+        return axis, angle
 
-        # R = I + sin(angle)*S + (1-cos(angle))*S^2
-        self.rotM = np.eye(3) + np.sin(angle) * S + (1 - np.cos(angle)) * S2
+    def apply_rotV(self):
+        """
+        Event triggered function on the event of a push on the button button_rotV 
+        """
+        rV = np.array([[float(self.entry_rotV_1.get())],[float(self.entry_rotV_2.get())],[float(self.entry_rotV_3.get())]])
+        axisSacado = rV / np.linalg.norm(rV)
+        angleSacado = np.linalg.norm(rV)
 
-        # update cube
+        rotM = rotFunc.Eaa2rotM(angleSacado, axisSacado)
+        self.M = np.dot(rotM, self.M)
+        self.setRotMatrix(rotM)
+        self.rotMToAngleAxis(rotM)
+        self.rotM = rotM
+        self.update_cube()
 
-        # Update rotation matrix info
+        
         entries = [
             (self.entry_RotM_11, self.rotM[0, 0]),
             (self.entry_RotM_12, self.rotM[0, 1]),
@@ -287,60 +473,8 @@ class Arcball(customtkinter.CTk):
             entry.delete(0, "end")
             entry.insert(0, value)
             entry.configure(state="disabled")
-
-        
-        for i in range(self.M.shape[1]):
-            v = np.array(self.M[:,i],ndmin=2).T
-            vr = rotFunc.Rotate3D_AA(v, axis, angle)
-            self.M[:,i] = vr[:,0].T
-        
-        self.update_cube()
-
-        pass
-        
-    
-    def apply_rotV(self):
-        """
-        Event triggered function on the event of a push on the button button_rotV 
-        """
-        self.rotv = np.array((self.entry_rotV_1.get(), self.entry_rotV_2.get(), self.entry_rotV_3.get()))
-        self.rotv = np.asarray(self.rotv, dtype=float)
-        norm = np.linalg.norm(self.rotv)
-        if norm != 0:
-            self.rotv /= norm
-            self.rotM = rotFunc.RotVec2RotM(self.rotv)
-            
-            # Move the cube using the rotation vector
-
-            # Update cube
-            for i in range(self.M.shape[1]): 
-                v = np.array(self.M[:,i], ndmin=2).T
-                vr = self.rotM @ v
-                self.M[:,i] = vr[:,0].T
-            
-            self.update_cube()
-           
-            # Update rotation matrix info
-            
-            entries = [
-                (self.entry_RotM_11, self.rotM[0, 0]),
-                (self.entry_RotM_12, self.rotM[0, 1]),
-                (self.entry_RotM_13, self.rotM[0, 2]),
-                (self.entry_RotM_21, self.rotM[1, 0]),
-                (self.entry_RotM_22, self.rotM[1, 1]),
-                (self.entry_RotM_23, self.rotM[1, 2]),
-                (self.entry_RotM_31, self.rotM[2, 0]),
-                (self.entry_RotM_32, self.rotM[2, 1]),
-                (self.entry_RotM_33, self.rotM[2, 2])
-            ]
-
-            for entry, value in entries:
-                entry.configure(state="normal")
-                entry.delete(0, "end")
-                entry.insert(0, value)
-                entry.configure(state="disabled")
-
-    
+                
+                
     def apply_EA(self):
      """
      Event triggered function on the event of a push on the button button_euler_angles
