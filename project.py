@@ -304,41 +304,41 @@ class Arcball(customtkinter.CTk):
         Event triggered function on the event of a push on the button button_rotV 
         """
         self.rotv = np.array((self.entry_rotV_1.get(), self.entry_rotV_2.get(), self.entry_rotV_3.get()))
-        self.rotv = np.asarray(self.rotv, dtype=float) / np.linalg.norm(np.asarray(self.rotv, dtype=float))
-        self.rotM = rotFunc.RotVec2RotM(self.rotv)
-        
-        #mueve el cubo a partir del vector de rotacion
+        self.rotv = np.asarray(self.rotv, dtype=float)
+        norm = np.linalg.norm(self.rotv)
+        if norm != 0:
+            self.rotv /= norm
+            self.rotM = rotFunc.RotVec2RotM(self.rotv)
+            
+            # Move the cube using the rotation vector
 
-        # Update cube
-        for i in range(self.M.shape[1]): 
-            v = np.array(self.M[:,i], ndmin=2).T
-            vr = rotFunc.Rotate3D_RV(v, self.rotM)
-            self.M[:,i] = vr[:,0].T
-        
-        self.update_cube()
-       
-        # Update rotation matrix info
-        
-        entries = [
-            (self.entry_RotM_11, self.rotM[0, 0]),
-            (self.entry_RotM_12, self.rotM[0, 1]),
-            (self.entry_RotM_13, self.rotM[0, 2]),
-            (self.entry_RotM_21, self.rotM[1, 0]),
-            (self.entry_RotM_22, self.rotM[1, 1]),
-            (self.entry_RotM_23, self.rotM[1, 2]),
-            (self.entry_RotM_31, self.rotM[2, 0]),
-            (self.entry_RotM_32, self.rotM[2, 1]),
-            (self.entry_RotM_33, self.rotM[2, 2])
-        ]
+            # Update cube
+            for i in range(self.M.shape[1]): 
+                v = np.array(self.M[:,i], ndmin=2).T
+                vr = self.rotM @ v
+                self.M[:,i] = vr[:,0].T
+            
+            self.update_cube()
+           
+            # Update rotation matrix info
+            
+            entries = [
+                (self.entry_RotM_11, self.rotM[0, 0]),
+                (self.entry_RotM_12, self.rotM[0, 1]),
+                (self.entry_RotM_13, self.rotM[0, 2]),
+                (self.entry_RotM_21, self.rotM[1, 0]),
+                (self.entry_RotM_22, self.rotM[1, 1]),
+                (self.entry_RotM_23, self.rotM[1, 2]),
+                (self.entry_RotM_31, self.rotM[2, 0]),
+                (self.entry_RotM_32, self.rotM[2, 1]),
+                (self.entry_RotM_33, self.rotM[2, 2])
+            ]
 
-        for entry, value in entries:
-            entry.configure(state="normal")
-            entry.delete(0, "end")
-            entry.insert(0, value)
-            entry.configure(state="disabled")
-
-   
-        pass
+            for entry, value in entries:
+                entry.configure(state="normal")
+                entry.delete(0, "end")
+                entry.insert(0, value)
+                entry.configure(state="disabled")
 
     
     def apply_EA(self):
