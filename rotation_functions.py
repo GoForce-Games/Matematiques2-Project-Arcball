@@ -202,5 +202,21 @@ def RV2AA(vector:np.ndarray) -> Tuple[np.ndarray,float]:
 
 
 
+def euler2rotM(angles):
+    '''
+    Returns the 3x3 rotation matrix R for a given set of Euler angles (in radians).
+    Euler angles are specified as [phi, theta, psi], representing rotations around Z, Y, and X axes, respectively.
+    '''
 
+    phi, theta, psi = angles
+
+    cos_phi, sin_phi = np.cos(phi), np.sin(phi)
+    cos_theta, sin_theta = np.cos(theta), np.sin(theta)
+    cos_psi, sin_psi = np.cos(psi), np.sin(psi)
+
+    R = np.array([[cos_theta*cos_psi, -cos_phi*sin_psi + sin_phi*sin_theta*cos_psi, sin_phi*sin_psi + cos_phi*sin_theta*cos_psi],
+                  [cos_theta*sin_psi, cos_phi*cos_psi + sin_phi*sin_theta*sin_psi, -sin_phi*cos_psi + cos_phi*sin_theta*sin_psi],
+                  [-sin_theta, sin_phi*cos_theta, cos_phi*cos_theta]])
+
+    return R
 
