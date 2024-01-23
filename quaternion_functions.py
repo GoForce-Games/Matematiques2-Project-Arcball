@@ -63,3 +63,22 @@ def Quat2RotM(q:np.ndarray[4,1]) -> np.ndarray[3,3]:
     R = R1+R2+R3
 
     return R
+
+def DVec2Quat(v1:np.ndarray[3,1],v2:np.ndarray[3,1])->np.ndarray[4,1]:
+    '''
+    Returns a quaternion that represents the rotation between two vectors
+    '''
+    #First, normalize both vectors
+    vec1 = v1.copy()/np.linalg.norm(v1)
+    vec2 = v2.copy()/np.linalg.norm(v2)
+
+    #Then we obtain the rotation axis between those two vectors by using cross product
+    cross = np.cross(vec1, vec2)
+
+    #Quaternion is formed by the dot product of both vectors +1 as the real part, and the cross product as the imaginary part
+    q = np.ones((4,1))
+    q[0,:] = np.dot(vec1, vec2)+1
+    q[1:,:] = cross
+
+    #given two parallel vectors, an identity quaternion will be returned
+    return q

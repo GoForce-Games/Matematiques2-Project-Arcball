@@ -546,9 +546,11 @@ class Arcball(customtkinter.CTk):
         if self.pressed: #Only triggered if previous click
             x_fig,y_fig= self.canvas_coordinates_to_figure_coordinates(event.x,event.y) #Extract viewport coordinates
             
+            r2 = x_fig*x_fig+y_fig*y_fig
+
             print("x: ", x_fig)
             print("y", y_fig)
-            print("r2", x_fig*x_fig+y_fig*y_fig)
+            print("r2", r2)
 
             R = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])
                     
