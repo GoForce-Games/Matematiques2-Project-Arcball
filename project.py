@@ -19,6 +19,10 @@ class Arcball(customtkinter.CTk):
     def __init__(self):
         super().__init__()
 
+        # Mouse position from previous drag frame
+        self.mouseX = 0
+        self.mouseY = 0
+
         # Orientation vars. Initialized to represent 0 rotation
         self.quat = np.array([[1],[0],[0],[0]])
         self.rotM = np.eye(3)
@@ -497,7 +501,7 @@ class Arcball(customtkinter.CTk):
 
         q = q/np.linalg.norm(q) #normalize the quaternion
         
-        for i in range(self.M.shape[1]): #TODO buscar que coño es self.M en este caso
+        for i in range(self.M.shape[1]):
             v = np.array(self.M[:,i],ndmin=2).T
             vr = quatFunc.Rotate3D(v, q)
             self.M[:,i] = vr[:,0].T
@@ -537,7 +541,27 @@ class Arcball(customtkinter.CTk):
 
         if event.button:
             self.pressed = True # Bool to control(activate) a drag (click+move)
+            self.mouseX, self.mouseY = self.canvas_coordinates_to_figure_coordinates(event.x,event.y) #Set initial mouse drag coordinates
 
+    def GetVectorFromSurface(self,x,y,r):
+        """
+        Returns a vector with Holroyd's arcball method, given the figure coordinates and a virtual sphere radius
+        """
+        ret = np.ones((3,1))
+
+        if (((x**2) + (y**2))< 0.5*r**2): #calculate from sphere's surface
+            ret[0,0] = x
+            ret[1,0] = y
+            ret[2,0] = np.sqrt((r**2)-(x**2)-(y**2))
+        else:
+            ret[0,0] = x
+            ret[1,0] = y
+            ret[2,0] = ((r**2)/(2*np.sqrt(x**2+y**2)))
+        
+        norm = np.linalg.norm(ret)
+        ret = ret/norm #normalize the vector
+
+        return ret
 
     def onmove(self,event):
         """
@@ -550,14 +574,30 @@ class Arcball(customtkinter.CTk):
             
             r2 = x_fig*x_fig+y_fig*y_fig
 
-            print("x: ", x_fig)
-            print("y", y_fig)
-            print("r2", r2)
+            #print("x: ", x_fig)
+            #print("y", y_fig)
+            #print("r2", r2)
 
-            R = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])
+            #Roger: no tengo ni idea de por que el cubo termina rotando tan rapido, pero esto es lo mas cerca que he podido llegar de hacer que gire correctamente
+
+            movX,movY = x_fig,y_fig#x_fig-self.mouseX, y_fig-self.mouseY
+            self.mouseX, self.mouseY = x_fig, y_fig
+
+            prevAxis, prevAngle = rotFunc.RotM2Eaa(self.rotM)
+
+            #use vertex distance from origin as virtual sphere radius
+            sVec = self.GetVectorFromSurface(movX,movY,np.linalg.norm(self.M[:,0]))
+
+            newQ = quatFunc.DVec2Quat(prevAxis,sVec)
+
+            print("quat:",newQ.flatten())
+
+            self.rotM = R = quatFunc.Quat2RotM(newQ)
+            #R = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])
                     
             self.M = R.dot(self.M) #Modify the vertices matrix with a rotation matrix M
 
+            self.update_rotM_visual()
             self.update_cube() #Update the cube
 
 

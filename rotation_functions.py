@@ -145,13 +145,18 @@ def Eaa2rotM(angle, axis):
 
     return R
 
-def RotM2Eaa(matrix:np.ndarray) ->Tuple[np.ndarray,float]:
+def RotM2Eaa(R:np.ndarray) ->Tuple[np.ndarray,float]:
     '''
     WIP: Converts a rotation matrix to an axis and angle tuple
     '''
-    axis = 0
-    angle = 0
+    angle = np.arccos((np.trace(R)-1)/2)
+    if angle == 0:
+        axis = np.atleast_2d([1,1,1]).T
+        axis = axis / np.linalg.norm(axis)
+        return axis, angle
 
+    u_sk = (R-R.T)/(2*np.sin(angle))
+    axis = np.atleast_2d([u_sk[1,2],u_sk[2,0],u_sk[0,1]]).T
 
     return axis, angle
 

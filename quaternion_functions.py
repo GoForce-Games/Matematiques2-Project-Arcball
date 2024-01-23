@@ -21,7 +21,9 @@ def MultQuat(q1:np.ndarray[4,1],q2:np.ndarray[4,1]) -> np.ndarray[4,1]:
     return result
 
 def Normalized(q:np.ndarray[4,1]) -> np.ndarray[4,1]:
-    return q.copy()/np.linalg.norm(q)
+    ret = q.copy()
+    ret = ret/np.linalg.norm(ret)
+    return ret
 
 def ConjQuat(q:np.ndarray[4,1]) -> np.ndarray[4,1]:
     qConj = q.copy()
@@ -69,16 +71,16 @@ def DVec2Quat(v1:np.ndarray[3,1],v2:np.ndarray[3,1])->np.ndarray[4,1]:
     Returns a quaternion that represents the rotation between two vectors
     '''
     #First, normalize both vectors
-    vec1 = v1.copy()/np.linalg.norm(v1)
-    vec2 = v2.copy()/np.linalg.norm(v2)
+    vec1 = v1.flatten()/np.linalg.norm(v1)
+    vec2 = v2.flatten()/np.linalg.norm(v2)
 
     #Then we obtain the rotation axis between those two vectors by using cross product
-    cross = np.cross(vec1, vec2)
+    crossProd = np.cross(vec1.flatten(),vec2.flatten())
 
     #Quaternion is formed by the dot product of both vectors +1 as the real part, and the cross product as the imaginary part
     q = np.ones((4,1))
-    q[0,:] = np.dot(vec1, vec2)+1
-    q[1:,:] = cross
+    q[0,:] = vec1.dot(vec2)+1
+    q[1:,0] = crossProd[:]
 
     #given two parallel vectors, an identity quaternion will be returned
-    return q
+    return Normalized(q)
