@@ -386,7 +386,7 @@ class Arcball(customtkinter.CTk):
         axisX = float(self.entry_AA_ax1.get())
         axisY = float(self.entry_AA_ax2.get())
         axisZ = float(self.entry_AA_ax3.get())
-        rotM = rotFunc.Eaa2r5otM(angle, np.array([axisX, axisY, axisZ]))
+        rotM = rotFunc.Eaa2rotM(angle, np.array([axisX, axisY, axisZ]))
     
         #self.M = rotM@self.M 
         
@@ -478,7 +478,9 @@ class Arcball(customtkinter.CTk):
 
         self.M[:,i] = rotated_vector[:,0].T
  
+     self.rotM = rotFunc.euler2rotM(angles)
     
+     self.update_rotM_visual()
 
      self.update_cube()
 
