@@ -505,6 +505,16 @@ class Arcball(customtkinter.CTk):
             v = np.array(self.M[:,i],ndmin=2).T
             vr = quatFunc.Rotate3D(v, q)
             self.M[:,i] = vr[:,0].T
+        
+        self.entry_quat_0.delete(0,'end')
+        self.entry_quat_1.delete(0,'end')
+        self.entry_quat_2.delete(0,'end')
+        self.entry_quat_3.delete(0,'end')
+        self.entry_quat_0.insert(0,q[0,0])
+        self.entry_quat_1.insert(0,q[1,0])
+        self.entry_quat_2.insert(0,q[2,0])
+        self.entry_quat_3.insert(0,q[3,0])
+        self.quat = q
 
         self.rotM = quatFunc.Quat2RotM(q)
         self.update_rotM_visual()
@@ -581,7 +591,7 @@ class Arcball(customtkinter.CTk):
             #Roger: no tengo ni idea de por que el cubo termina rotando tan rapido, pero esto es lo mas cerca que he podido llegar de hacer que gire correctamente
 
             movX,movY = x_fig,y_fig#x_fig-self.mouseX, y_fig-self.mouseY
-            self.mouseX, self.mouseY = x_fig, y_fig
+            self.mouseX, self.mouseY = x_fig*100, y_fig*100
 
             prevAxis, prevAngle = rotFunc.RotM2Eaa(self.rotM)
 
