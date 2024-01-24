@@ -24,11 +24,11 @@ class Arcball(customtkinter.CTk):
         self.mouseY = 0
 
         # Orientation vars. Initialized to represent 0 rotation
-        self.quat = np.array([[1],[0],[0],[0]])
+        self.quat = np.array([[1.0],[0.0],[0.0],[0.0]])
         self.rotM = np.eye(3)
-        self.AA = {"axis": np.array([[0],[0],[0]]), "angle":0.0}
-        self.rotv = np.array([[0],[0],[0]])
-        self.euler = np.array([[0],[0],[0]])
+        self.AA = {"axis": np.array([[0.0],[0.0],[0.0]]), "angle":0.0}
+        self.rotv = np.array([[0.0],[0.0],[0.0]])
+        self.euler = np.array([[0.0],[0.0],[0.0]])
 
         # configure window
         self.title("Holroyd's arcball")
