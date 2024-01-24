@@ -506,6 +506,7 @@ class Arcball(customtkinter.CTk):
             vr = quatFunc.Rotate3D(v, q)
             self.M[:,i] = vr[:,0].T
         
+        #update quaternion shown on screen
         self.entry_quat_0.delete(0,'end')
         self.entry_quat_1.delete(0,'end')
         self.entry_quat_2.delete(0,'end')
@@ -516,6 +517,7 @@ class Arcball(customtkinter.CTk):
         self.entry_quat_3.insert(0,q[3,0])
         self.quat = q
 
+        #convert quaternion into rotation matrix to update the shown rotation matrix
         self.rotM = quatFunc.Quat2RotM(q)
         self.update_rotM_visual()
         
