@@ -591,7 +591,7 @@ class Arcball(customtkinter.CTk):
             #Roger: no tengo ni idea de por que el cubo termina rotando tan rapido, pero esto es lo mas cerca que he podido llegar de hacer que gire correctamente
 
             movX,movY = x_fig,y_fig#x_fig-self.mouseX, y_fig-self.mouseY
-            self.mouseX, self.mouseY = x_fig*100, y_fig*100
+            self.mouseX, self.mouseY = x_fig, y_fig
 
             prevAxis, prevAngle = rotFunc.RotM2Eaa(self.rotM)
 
