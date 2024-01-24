@@ -516,7 +516,7 @@ class Arcball(customtkinter.CTk):
         self.entry_quat_3.insert(0,self.quat[3,0])
 
         #convert quaternion into rotation matrix to update the shown rotation matrix
-        self.rotM = quatFunc.Quat2RotM(q)
+        self.rotM = quatFunc.Quat2RotM(self.quat)
         self.update_rotM_visual()
         
         self.update_cube()
