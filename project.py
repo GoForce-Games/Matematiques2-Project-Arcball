@@ -493,17 +493,16 @@ class Arcball(customtkinter.CTk):
         """
         Event triggered function on the event of a push on the button button_quat
         """
-        q = np.zeros((4,1))
-        q[0,0] = self.entry_quat_0.get()
-        q[1,0] = self.entry_quat_1.get()
-        q[2,0] = self.entry_quat_2.get()
-        q[3,0] = self.entry_quat_3.get()
+        self.quat[0,0] = self.entry_quat_0.get()
+        self.quat[1,0] = self.entry_quat_1.get()
+        self.quat[2,0] = self.entry_quat_2.get()
+        self.quat[3,0] = self.entry_quat_3.get()
 
-        q = q/np.linalg.norm(q) #normalize the quaternion
+        self.quat = self.quat/np.linalg.norm(self.quat) #normalize the quaternion
         
         for i in range(self.M.shape[1]):
             v = np.array(self.M[:,i],ndmin=2).T
-            vr = quatFunc.Rotate3D(v, q)
+            vr = quatFunc.Rotate3D(v, self.quat)
             self.M[:,i] = vr[:,0].T
         
         #update quaternion shown on screen
@@ -511,11 +510,10 @@ class Arcball(customtkinter.CTk):
         self.entry_quat_1.delete(0,'end')
         self.entry_quat_2.delete(0,'end')
         self.entry_quat_3.delete(0,'end')
-        self.entry_quat_0.insert(0,q[0,0])
-        self.entry_quat_1.insert(0,q[1,0])
-        self.entry_quat_2.insert(0,q[2,0])
-        self.entry_quat_3.insert(0,q[3,0])
-        self.quat = q
+        self.entry_quat_0.insert(0,self.quat[0,0])
+        self.entry_quat_1.insert(0,self.quat[1,0])
+        self.entry_quat_2.insert(0,self.quat[2,0])
+        self.entry_quat_3.insert(0,self.quat[3,0])
 
         #convert quaternion into rotation matrix to update the shown rotation matrix
         self.rotM = quatFunc.Quat2RotM(q)
