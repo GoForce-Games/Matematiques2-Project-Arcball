@@ -21,7 +21,7 @@ class Arcball(customtkinter.CTk):
 
         # Mouse position from previous drag frame
         self.radius = 1
-        self.prevPos = self.GetVectorFromSurface(0,0,self.radius)
+        self.prevPos = self.GetPointFromSurface(0,0,self.radius)
 
         # Orientation vars. Initialized to represent 0 rotation
         self.quat = np.array([[1.0],[0.0],[0.0],[0.0]])
@@ -576,7 +576,7 @@ class Arcball(customtkinter.CTk):
             self.pressed = True # Bool to control(activate) a drag (click+move)
             self.prevX, self.prevY = self.canvas_coordinates_to_figure_coordinates(event.x,event.y) #Set initial mouse drag coordinates
 
-    def GetVectorFromSurface(self,x,y,r):
+    def GetPointFromSurface(self,x,y,r):
         """
         Returns a vector with Holroyd's arcball method, given the figure coordinates and a virtual sphere radius
         """
@@ -612,15 +612,10 @@ class Arcball(customtkinter.CTk):
             #print("y", y_fig)
             #print("r2", r2)
 
-            #Roger: no tengo ni idea de por que el cubo termina rotando tan rapido, pero esto es lo mas cerca que he podido llegar de hacer que gire correctamente
-
             movX,movY = x_fig-self.prevX, y_fig-self.prevY
             self.prevX, self.prevY = x_fig, y_fig
 
-            #use vertex distance from origin as virtual sphere radius
-            sVec = self.GetVectorFromSurface(movY,movX,self.radius)
-
-            #sVec = rotFunc.Eaa2rotM(np.pi/2,np.array([[1,0,0]]).T)@sVec
+            sVec = self.GetPointFromSurface(movY,movX,self.radius)
 
             newQ = quatFunc.DVec2Quat(self.prevPos,sVec)
 
@@ -629,7 +624,7 @@ class Arcball(customtkinter.CTk):
             self.rotM = R = quatFunc.Quat2RotM(newQ)
             #R = np.array([[0, 1, 0], [-1, 0, 0], [0, 0, 1]])
                     
-            self.M = R.dot(self.M) #Modify the vertices matrix with a rotation matrix M
+            self.M = R.dot(self.M) #Modify the vertices matrix with a rotation matrix R
 
             self.update_rotM_visual()
             self.update_cube() #Update the cube

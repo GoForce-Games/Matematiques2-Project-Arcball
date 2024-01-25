@@ -75,11 +75,11 @@ def DVec2Quat(v1:np.ndarray[3,1],v2:np.ndarray[3,1])->np.ndarray[4,1]:
     vec2 = v2.flatten()/np.linalg.norm(v2)
 
     #Then we obtain the rotation axis between those two vectors by using cross product
-    crossProd = np.cross(vec1.flatten(),vec2.flatten())
+    crossProd = np.cross(vec1,vec2)
 
     #Quaternion is formed by the dot product of both vectors +1 as the real part, and the cross product as the imaginary part
     q = np.ones((4,1))
-    q[0,:] = vec1.dot(vec2)+1
+    q[0,:] = 1 + vec1.dot(vec2)
     q[1:,0] = crossProd[:]
 
     #given two parallel vectors, an identity quaternion will be returned
