@@ -582,14 +582,15 @@ class Arcball(customtkinter.CTk):
         """
         ret = np.ones((3,1))
 
+        #viewport axes are not what i thought them to be. This combination seems to result in correct rotation (x,radius,-y)
         if (((x**2) + (y**2)) < 0.5*(r**2)): #calculate from sphere's surface if close to the center
             ret[0,0] = x
-            ret[1,0] = y
-            ret[2,0] = np.abs(np.sqrt((r**2)-(x**2)-(y**2)))
+            ret[1,0] = np.abs(np.sqrt((r**2)-(x**2)-(y**2)))
+            ret[2,0] = -y
         else: #otherwise calculate from hyperboloid's surface instead
             ret[0,0] = x
-            ret[1,0] = y
-            ret[2,0] = ((r**2)/(2*np.sqrt(x**2+y**2)))
+            ret[1,0] = ((r**2)/(2*np.sqrt(x**2+y**2)))
+            ret[2,0] = -y
         
         norm = np.linalg.norm(ret)
         ret = ret/norm #normalize the vector
@@ -619,7 +620,7 @@ class Arcball(customtkinter.CTk):
             #use vertex distance from origin as virtual sphere radius
             sVec = self.GetVectorFromSurface(movY,movX,self.radius)
 
-            sVec = rotFunc.Eaa2rotM(np.pi/2,np.array([[1,0,0]]).T)@sVec
+            #sVec = rotFunc.Eaa2rotM(np.pi/2,np.array([[1,0,0]]).T)@sVec
 
             newQ = quatFunc.DVec2Quat(self.prevPos,sVec)
 
