@@ -20,8 +20,8 @@ class Arcball(customtkinter.CTk):
         super().__init__()
 
         # Mouse position from previous drag frame
-        self.mouseX = 0
-        self.mouseY = 0
+        self.radius = 1
+        self.prevPos = self.GetVectorFromSurface(0,0,self.radius)
 
         # Orientation vars. Initialized to represent 0 rotation
         self.quat = np.array([[1.0],[0.0],[0.0],[0.0]])
@@ -574,7 +574,7 @@ class Arcball(customtkinter.CTk):
 
         if event.button:
             self.pressed = True # Bool to control(activate) a drag (click+move)
-            self.mouseX, self.mouseY = self.canvas_coordinates_to_figure_coordinates(event.x,event.y) #Set initial mouse drag coordinates
+            self.prevX, self.prevY = self.canvas_coordinates_to_figure_coordinates(event.x,event.y) #Set initial mouse drag coordinates
 
     def GetVectorFromSurface(self,x,y,r):
         """
@@ -582,11 +582,11 @@ class Arcball(customtkinter.CTk):
         """
         ret = np.ones((3,1))
 
-        if (((x**2) + (y**2))< 0.5*r**2): #calculate from sphere's surface
+        if (((x**2) + (y**2)) < 0.5*(r**2)): #calculate from sphere's surface if close to the center
             ret[0,0] = x
             ret[1,0] = y
-            ret[2,0] = np.sqrt((r**2)-(x**2)-(y**2))
-        else:
+            ret[2,0] = np.abs(np.sqrt((r**2)-(x**2)-(y**2)))
+        else: #otherwise calculate from hyperboloid's surface instead
             ret[0,0] = x
             ret[1,0] = y
             ret[2,0] = ((r**2)/(2*np.sqrt(x**2+y**2)))
@@ -613,15 +613,15 @@ class Arcball(customtkinter.CTk):
 
             #Roger: no tengo ni idea de por que el cubo termina rotando tan rapido, pero esto es lo mas cerca que he podido llegar de hacer que gire correctamente
 
-            movX,movY = x_fig,y_fig#x_fig-self.mouseX, y_fig-self.mouseY
-            self.mouseX, self.mouseY = x_fig, y_fig
-
-            prevAxis, prevAngle = rotFunc.RotM2Eaa(self.rotM)
+            movX,movY = x_fig-self.prevX, y_fig-self.prevY
+            self.prevX, self.prevY = x_fig, y_fig
 
             #use vertex distance from origin as virtual sphere radius
-            sVec = self.GetVectorFromSurface(movX,movY,np.linalg.norm(self.M[:,0]))
+            sVec = self.GetVectorFromSurface(movY,movX,self.radius)
 
-            newQ = quatFunc.DVec2Quat(prevAxis,sVec)
+            sVec = rotFunc.Eaa2rotM(np.pi/2,np.array([[1,0,0]]).T)@sVec
+
+            newQ = quatFunc.DVec2Quat(self.prevPos,sVec)
 
             print("quat:",newQ.flatten())
 
