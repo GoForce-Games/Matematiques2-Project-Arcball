@@ -128,9 +128,7 @@ def Eaa2rotM(angle, axis):
     '''
     Returns the rotation matrix R able to rotate vectors an angle 'angle' (in rads) about the axis 'axis'
     Axis = X Y Z
-    '''
-
-    
+    '''    
     axis_norm = np.linalg.norm(axis)
     
 

@@ -231,11 +231,10 @@ class Arcball(customtkinter.CTk):
         self.entry_RotM_33.configure(state="disabled")
         self.entry_RotM_33.grid(row=2, column=3, padx=(2,0), pady=(2,0), sticky="ew")
     
-    def setRotMatrix(self, rotM):
+    def setMatrizRotacion(self, rotM):
         """
         Funcion que hace cambiar la rotM de abajo
         """
-
         rotM = rotM.copy()
        
         self.entry_RotM_11.configure(state="normal")
@@ -301,8 +300,7 @@ class Arcball(customtkinter.CTk):
         self.entry_RotM_32.configure(state="disabled")
         self.entry_RotM_33.configure(state="disabled")
 
-    def rotMToAngleAxis(self, rotM):
-
+    def matrizRotacionToAnguloEje(self, rotM):
         
         R = rotM
 
@@ -326,7 +324,7 @@ class Arcball(customtkinter.CTk):
         self.entry_AA_ax3.insert(0,axis_org[2])
 
     
-    def rotMToRotationVector(self, rotM):
+    def matrizRotacionToVectorRotacion(self, rotM):
         R = rotM
 
         angle = np.arccos((np.trace(R) - 1) / 2)
@@ -371,66 +369,33 @@ class Arcball(customtkinter.CTk):
       # Actualizar el cubo en la interfaz gráfica
       self.update_cube()
 
-    
+        
     def apply_AA(self):
         """
-        Event triggered function on the event of a push on the button button_AA
-        """
-        self.M = np.array(
-            [[ -1,  -1, 1],   #Node 0
-            [ -1,   1, 1],    #Node 1
-            [1,   1, 1],      #Node 2
-            [1,  -1, 1],      #Node 3
-            [-1,  -1, -1],    #Node 4
-            [-1,  1, -1],     #Node 5
-            [1,   1, -1],     #Node 6
-            [1,  -1, -1]], dtype=float).transpose()
-
+        Evento desencadenado por la pulsación del botón button_AA
+        """           
+        # Obtener los valores del ángulo y del eje de rotación
         angle = float(self.entry_AA_angle.get())
         axisX = float(self.entry_AA_ax1.get())
         axisY = float(self.entry_AA_ax2.get())
         axisZ = float(self.entry_AA_ax3.get())
+
+        # Calcular la matriz de rotación
         rotM = rotFunc.Eaa2rotM(angle, np.array([axisX, axisY, axisZ]))
-    
-        #self.M = rotM@self.M 
-        
-        
+
+        # Aplicar la rotación a los vértices del cubo
         self.M = np.dot(rotM, self.M)
-        
 
+        # Actualizar la matriz de rotación en la interfaz gráfica
+        self.setMatrizRotacion(rotM)
 
-        self.setRotMatrix(rotM)
-        self.rotMToRotationVector(rotM)
+        # Almacenar la matriz de rotación actual
         self.rotM = rotM
+
+        # Actualizar la representación gráfica del cubo
         self.update_cube()
-
-        pass
         
-    
-    def convert_to_axis_angle(rotv):
-        """
-        Convert a rotation vector to axis and angle representation.
-        """
-        angle = np.linalg.norm(rotv)
-        axis = rotv / angle
-        return axis, angle
-
-    def apply_rotV(self):
-        """
-        Event triggered function on the event of a push on the button button_rotV 
-        """
-        rV = np.array([[float(self.entry_rotV_1.get())],[float(self.entry_rotV_2.get())],[float(self.entry_rotV_3.get())]])
-        axisSacado = rV / np.linalg.norm(rV)
-        angleSacado = np.linalg.norm(rV)
-
-        rotM = rotFunc.Eaa2rotM(angleSacado, axisSacado)
-        self.M = np.dot(rotM, self.M)
-        self.setRotMatrix(rotM)
-        self.rotMToAngleAxis(rotM)
-        self.rotM = rotM
-        self.update_cube()
-
-        
+        # Ajustar los valores de los entrys de la interfaz gráfica
         entries = [
             (self.entry_RotM_11, self.rotM[0, 0]),
             (self.entry_RotM_12, self.rotM[0, 1]),
@@ -448,7 +413,65 @@ class Arcball(customtkinter.CTk):
             entry.delete(0, "end")
             entry.insert(0, value)
             entry.configure(state="disabled")
-                
+        pass
+        
+
+    
+    def convert_to_axis_angle(rotv):
+        """
+        Convert a rotation vector to axis and angle representation.
+        """
+        angle = np.linalg.norm(rotv)
+        axis = rotv / angle
+        return axis, angle
+
+    def apply_rotV(self):
+        """
+        Evento desencadenado por la pulsación del botón button_rotV.
+        """
+        # Obtener los valores del vector de rotación
+        vectorRotacion = np.array([[float(self.entry_rotV_1.get())],
+                        [float(self.entry_rotV_2.get())],
+                        [float(self.entry_rotV_3.get())]])
+
+        # Obtener el ángulo y el eje de rotación a partir del vector de rotación
+        eje = vectorRotacion / np.linalg.norm(vectorRotacion)
+        angulo = np.linalg.norm(vectorRotacion)
+
+        # Calcular la matriz de rotación a partir del ángulo y el eje de rotación
+        rotM = rotFunc.Eaa2rotM(angulo, eje)
+
+        # Aplicar la rotación a los vértices del cubo
+        self.M = np.dot(rotM, self.M)
+
+        # Actualizar la matriz de rotación en la interfaz gráfica
+        self.setMatrizRotacion(rotM)
+        
+        # Almacenar la matriz de rotación actual
+        self.rotM = rotM
+
+        # Actualizar la representación gráfica del cubo
+        self.update_cube()
+
+        # Ajustar los valores de los entrys de la interfaz gráfica
+        entries = [
+            (self.entry_RotM_11, self.rotM[0, 0]),
+            (self.entry_RotM_12, self.rotM[0, 1]),
+            (self.entry_RotM_13, self.rotM[0, 2]),
+            (self.entry_RotM_21, self.rotM[1, 0]),
+            (self.entry_RotM_22, self.rotM[1, 1]),
+            (self.entry_RotM_23, self.rotM[1, 2]),
+            (self.entry_RotM_31, self.rotM[2, 0]),
+            (self.entry_RotM_32, self.rotM[2, 1]),
+            (self.entry_RotM_33, self.rotM[2, 2])
+        ]
+
+        for entry, value in entries:
+            entry.configure(state="normal")
+            entry.delete(0, "end")
+            entry.insert(0, value)
+            entry.configure(state="disabled")
+            
                 
     def apply_EA(self):
      """
